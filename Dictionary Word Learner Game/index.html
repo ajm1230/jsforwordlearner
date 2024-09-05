@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Word Learner Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f5f5f5;
+      padding-top: 10px;
+    }
+    h1 {
+      color: #333;
+    }
+    .word-info {
+      margin: 0 auto; /* Align to center horizontally */
+      max-width: 600px; /* Limit width for responsiveness */
+      background-color: #fff;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      text-align: left; /* Align text inside word-info to left */
+    }
+     #meaning, #definition, .example {
+      margin-top: 10px;
+      color: black;
+      font-weight: bold;
+      font-size: 22px;
+    }
+
+    #word {
+      margin-top: 10px;
+      color: black;
+      font-weight: bold;
+      font-size: 40px;
+      text-align: center;
+      margin-bottom: 25px;
+    }
+    .latest-word {
+      background-color: red;
+      color: white;
+      padding: 5px;
+      border-radius: 5px;
+      display: none;
+      font-weight: bold;
+      font-size: 20px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    input[type="text"] {
+      width: 80%; /* Adjusted for responsiveness */
+      max-width: 400px; /* Limit width for responsiveness */
+      height: 30px;
+      padding: 8px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      margin-bottom: 10px;
+    }
+    @media (max-width: 768px) {
+      input[type="text"] {
+        width: 100%; /* Full width on smaller screens */
+        max-width: none; /* No maximum width on smaller screens */
+      }
+    } 
+
+    .greenLiner {
+    background-color: rgb(21, 224, 21);
+    width: auto;
+    height: 25px;
+    }
+    #totalWords {
+      font-weight: bold;
+      font-size: 20px;
+
+    }
+
+    /* Styles for password popup */
+    #passwordPopup {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+    }
+    .popup-content {
+      background-color: white;
+      width: 300px;
+      padding: 20px;
+      border-radius: 10px;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    .popup-content h2 {
+      margin-bottom: 10px;
+    }
+    .popup-content input[type="password"] {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+    }
+    .popup-content button {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .popup-content button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <button onclick="showPasswordPopup()">Show Total No. Of Words</button>
+  <h1>Word Learner Game</h1>
+ <div class="greenLiner" ></div>
+  <p id="totalWords"></p> 
+  <input type="text" id="searchInput" placeholder="Search..." oninput="searchWord()">
+  <div class="word-info">
+    <p id="latestWord" class="latest-word">Latest Word</p>
+    <div id="word"></div>
+    <div id="meaning"></div>
+    <div id="definition"></div>
+    <div id="example" class="example"></div>
+  </div>
+  <button onclick="nextWord()">Next Word</button>
+
+   <!-- Password popup -->
+   <div id="passwordPopup">
+    <div class="popup-content">
+      <h2>Enter Password</h2>
+      <input type="password" id="passwordInput" placeholder="Enter password">
+      <button onclick="checkPassword()">Submit</button>
+    </div>
+  </div>
+
+
+  <script src="word-implement.js" ></script>
+  <script>
+    function displayWord(index) {
+      document.getElementById("word").innerText = words[index].word;
+      document.getElementById("meaning").innerText = "Meaning: " + words[index].meaning;
+      document.getElementById("definition").innerText = "Definition: " + words[index].definition;
+      document.getElementById("example").innerText = "Example: " + words[index].example;
+    }
+
+    function nextWord() {
+      if (currentIndex === words.length) {
+        alert("All words have been displayed. Resetting.");
+        currentIndex = 0;
+      }
+      displayWord(currentIndex);
+      currentIndex++;
+      document.getElementById("latestWord").style.display = currentIndex === 1 ? "block" : "none";
+    }
+
+    function searchWord() {
+      const searchTerm = document.getElementById("searchInput").value.toLowerCase();
+      const matchingWords = words.filter(word => word.word.toLowerCase().includes(searchTerm));
+      if (matchingWords.length > 0) {
+        currentIndex = words.indexOf(matchingWords[0]);
+        displayWord(currentIndex);
+        document.getElementById("latestWord").style.display = currentIndex === 0 ? "block" : "none";
+      } else {
+        document.getElementById("word").innerText = "No matching word found.";
+        document.getElementById("meaning").innerText = "";
+        document.getElementById("definition").innerText = "";
+        document.getElementById("example").innerText = "";
+        document.getElementById("latestWord").style.display = "none";
+      }
+    }
+
+    window.onload = function() {
+      displayWord(currentIndex);
+      document.getElementById("latestWord").style.display = "block";
+      currentIndex++;  }
+
+
+
+
+  
+
+
+
+  </script>  
+
+  <script>   
+  
+  function showTotalWords() {
+    document.getElementById("totalWords").innerText = "Total Words: " + words.length;
+  }
+
+  function showPasswordPopup() {
+    document.getElementById("passwordPopup").style.display = "block";
+  }
+
+  function checkPassword() {
+    var password = document.getElementById("passwordInput").value;
+    if (password === "asdjkl786") {
+      document.getElementById("passwordPopup").style.display = "none";
+      showTotalWords();
+    } else {
+      alert("Password does not match. Please try again.");
+    }
+  }
+</script>
+<script src="aiwordgenerator.js" ></script>
+</body>
+</html>
